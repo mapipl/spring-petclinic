@@ -1,17 +1,23 @@
 #!groovy
 pipeline {
-    agent none
-   stages {
+  agent none
+  stages {
     stage('Maven Install') {
       agent {
-       docker {
-         image 'maven:3.8.8'  // Use a more recent Maven version
-         args '-v $HOME/.m2:/root/.m2'  // Mount the local .m2 directory for caching
-     }
+        docker {
+          image 'maven:3.8.8'  // Use a more recent Maven version
+          args '-v $HOME/.m2:/root/.m2'  // Mount the local .m2 directory for caching
+        }
+      }
+      steps {
+        sh 'mvn clean install'
+      }
+    }
+    stage('Docker Build') {
+      agent any
+      steps {
+        sh 'docker build -t shanem/spring-petclinic:latest .'
+      }
+    }
   }
-  steps {
-       sh 'mvn clean install'
-       }
-     }
-   }
- }
+}
